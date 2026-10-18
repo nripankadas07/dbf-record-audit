@@ -3,6 +3,15 @@ from dbf_record_audit import analyze,example,MAX_BYTES
 def changed(offset,data):
     value=bytearray(example());value[offset:offset+len(data)]=data;return bytes(value)
 class Behavior(unittest.TestCase):
+    def test_mixed_scale_sum_preserves_small_contribution(self):
+        from decimal import localcontext
+        head=bytearray(65);head[0]=3;struct.pack_into('<IHH',head,4,2,65,21)
+        head[32:34]=b'N\0';head[43]=ord('N');head[48]=20;head[49]=18;head[64]=13
+        raw=bytes(head)+b' '+b'99999999999999999999'+b' '+b'0.000000000000000001'
+        with localcontext() as context:
+            context.prec=6
+            result=analyze(raw)
+        self.assertEqual(result['groups']['active']['fields']['N']['sum'],'99999999999999999999.000000000000000001')
     def test_exact_decimal_and_deleted(self):
         r=analyze(example());self.assertEqual(r['finding_count'],0);self.assertEqual(r['groups']['active']['fields']['AMOUNT']['sum'],'0.30');self.assertEqual(r['groups']['deleted']['fields']['AMOUNT']['sum'],'9.99')
     def test_invalid_date(self):

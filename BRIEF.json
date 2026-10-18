@@ -1,7 +1,7 @@
 {
   "repo": "dbf-record-audit",
   "module": "dbf_record_audit",
-  "units": 18,
+  "units": 19,
   "capability": "Audit dBASE III binary table structure and active/deleted cell quality without coercing numeric data.",
   "user": "Legacy GIS/data ingestion maintainers reviewing a small DBF before migration.",
   "pain": "Silent float conversion, deletion filtering and cleanup can obscure malformed dates or decimal representations.",
