@@ -1,9 +1,15 @@
 """Read-only dBASE III plain-table structure and cell representation evidence."""
 from __future__ import annotations
 import argparse,datetime,hashlib,json,re,struct,sys
-from decimal import Decimal
+from decimal import Decimal,localcontext
 from pathlib import Path
 MAX_BYTES=4*1024*1024
+def exact_add(left,right):
+    # At most20 input digits,18 fractional places and20000 records:
+    # at most25 integer+18 fractional digits. Do not inherit caller precision.
+    with localcontext() as context:
+        context.prec=64
+        return left+right
 def example():
     fields=[('AMOUNT','N',8,2),('WHEN','D',8,0),('OK','L',1,0)]
     records=[b' '+b'    0.10'+b'20240229'+b'Y',b' '+b'    0.20'+b'20240301'+b'T',b'*'+b'    9.99'+b'20240101'+b'N']
@@ -48,7 +54,7 @@ def analyze(raw):
                 if not re.fullmatch(rb'[+-]?[0-9]+(?:\.[0-9]+)?',value):reason='invalid numeric representation'
                 elif len(value.split(b'.',1)[1])>f['decimals'] if b'.' in value else False:reason='fraction exceeds declared decimals'
                 if reason is None:
-                    number=Decimal(value.decode('ascii'));stats['sum']=str(Decimal(stats['sum'])+number)
+                    number=Decimal(value.decode('ascii'));stats['sum']=str(exact_add(Decimal(stats['sum']),number))
                     for key,choose in [('minimum',min),('maximum',max)]:stats[key]=str(number if stats[key] is None else choose(Decimal(stats[key]),number))
             elif kind=='D':
                 missing=missing or value==b'00000000'
