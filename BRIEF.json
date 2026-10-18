@@ -1,0 +1,31 @@
+{
+  "repo": "dbf-record-audit",
+  "module": "dbf_record_audit",
+  "units": 18,
+  "capability": "Audit dBASE III binary table structure and active/deleted cell quality without coercing numeric data.",
+  "user": "Legacy GIS/data ingestion maintainers reviewing a small DBF before migration.",
+  "pain": "Silent float conversion, deletion filtering and cleanup can obscure malformed dates or decimal representations.",
+  "comparables": [
+    "SheetJS/sheetjs",
+    "infused/dbf",
+    "olemb/dbfread",
+    "ethanfurman/dbf",
+    "SheetJS/j"
+  ],
+  "leader": "SheetJS/sheetjs",
+  "query": "DBF; spreadsheet parser plus documented reference follow",
+  "quick": "dbf-record-audit --make-example example.dbf\n.venv/bin/dbf-record-audit example.dbf",
+  "expected": "Generator creates a new invented DBF and refuses overwrite. Exit0: two active records sum exactly to0.30; one deleted record separately sums to9.99. A valid leap-day date is retained.",
+  "contract": "Binary plain dBASE III version03 only. Validate header/descriptor terminator, unique ASCII identifier field names, record width/count, deletion flags and optional single EOF byte. C,N,D,L fields only. Active and deleted rows have separate counts and numeric aggregates. Numeric values use exact decimal arithmetic; no exponents, commas, asterisk cleanup or silent rounding. Excess fractional digits, invalid calendar dates/logicals and character control bytes are findings. Blank and zero-date fields are missing. Character cells remain raw bytes: no codepage guessing or data conversion.",
+  "limits": "4 MiB,20000 records,128 fields,field names1..10 identifier characters. C width1..254; N width1..20 with decimals<=width-2; D8; L1. No memo/FoxPro/extensions, indexes, encoding conversion, table writes or business-metric interpretation. First512 cell findings identify row/field/reason without raw cell values; aggregates/field names can still be sensitive.",
+  "acceptance": "Exact0.1+0.2=.30, separate deleted rows, leap dates, invalid decimals/logicals, count/width/terminator errors, unsupported types and trailing byte rejection.",
+  "notes": "SheetJS is a broad spreadsheet conversion toolkit with DBF support; it was found by following the archived SheetJS/j project reference, not as the top result of the spreadsheet-parser query. SheetJS/j is archived historical context, not a maintained alternative. Dbfread already parses active/deleted records, and dbf/infused-dbf support broader DBF workflows. Selected dbfread parsing code informed our explicit refusal to coerce comma/asterisk representations. Historical date/precision issues are adjacent evidence, not verified demand for our product.",
+  "overlap": "No owned DBF binary table inspector was found among193 repositories. This is not another CSV/SQLite formatter: it validates dBASE descriptors, deletion semantics and fixed-width cell representation.",
+  "topics": [
+    "dbf",
+    "dbase",
+    "gis",
+    "python",
+    "data-quality"
+  ]
+}
